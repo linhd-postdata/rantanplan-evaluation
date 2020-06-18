@@ -127,3 +127,22 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# local
+tmp/
+carvajal.csv
+adso/
+sonnets/
+outputs/
+corpora/
+adso.json
+sonnets.json
+
+# latex
+*.aux
+*.bbl
+*.blg
+*.fdb*
+*.fls
+*.out
+*.synctex*
