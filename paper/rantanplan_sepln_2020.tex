@@ -24,16 +24,16 @@ $^1$Digital Humanities Innovation Lab, UNED, Madrid, Spain\\
 $^2$School of Human Sciences and Technology, IE University, Madrid, Spain\\ \{versae, alvaro.perez, laura.hernandez, sros\}@scc.uned.es,\\
 egonzalezblanco@faculty.ie.edu}
 
-\seplntranstitle{Rantanplan, silabificación y escansión rápidas de poesía española}
+\seplntranstitle{Rantanplan, silabación y escansión rápidas de poesía española}
 
 \seplnclave{acentuación, patrones métricos, escansión}
 
-\seplnresumen{El análisis automatizado de la poesía en corpus españoles carece de la riqueza de las herramientas disponibles para el inglés. Las opciones existentes adolecen de una serie de problemas: se limitan a versos endecasílabos de métrica fija, no están disponibles públicamente, el procedimiento de silabación no está probado a fondo, y su velocidad es mejorable. En el contexto del Proyecto ERC POSTDATA, este artículo presenta nuevos métodos para contrarrestar estos problemas. Para la silabación, contribuimos con nuestro propio método, así como un corpus elaborado manualmente. Para la escansión, nuestro enfoque se basa en una heurística para la aplicación de figuras retóricas que alteran la longitud métrica. La evaluación experimental demuestra que tanto la poesía de métrica fija como la de métrica mixta se analizan con éxito, obteniéndose patrones métricos con mayor precisión (mejoras de un 2\% y un 20\%, respectivamente), y en una fracción del tiempo que otros métodos necesitan (ejecutándose al menos 100 veces más rápido).}
+\seplnresumen{El análisis automatizado de la poesía en corpus españoles carece de la riqueza de las herramientas disponibles para el inglés. Las opciones existentes adolecen de una serie de problemas: se limitan a versos endecasílabos de métrica fija, no están disponibles públicamente, el procedimiento de silabación no está probado a fondo, y su velocidad es mejorable. En el contexto del Proyecto ERC POSTDATA, este artículo presenta nuevos métodos para contrarrestar estos problemas. Para la silabación, contribuimos con nuestro propio método, así como un corpus elaborado manualmente. Para la escansión, nuestro enfoque se basa en una heurística para la aplicación de figuras retóricas que alteran la longitud métrica. La evaluación experimental demuestra que tanto la poesía de métrica fija como la de métrica mixta se analizan con éxito, obteniéndose patrones métricos con mayor precisión (mejoras de un 2\% y un 15\%, respectivamente), y en una fracción del tiempo que otros métodos necesitan (ejecutándose al menos 100 veces más rápido).}
 
 
 \seplnkey{stress, metrical patterns, scansion}
 
-\seplnabstract{Automated analysis of Spanish poetry corpora lacks the richness of tools available for English. The existing options suffer from a number of issues: are limited to fixed-metre hendecasyllabic verses, are not publicly available, the syllabification procedure underneath is not thoroughly tested, and their speed is questionable. Within the context of the ERC POSTDATA Project, this paper introduces new methods to alleviate these concerns. For syllabification, we contribute with our own method and manually crafted corpus. For scansion, our approach is based on a heuristic for the application of rhetorical figures that alter metrical length. Experimental evaluation shows that both fixed-metre and mixed-metre poetry can be successfully analyzed, producing metrical patterns more accurately (increasing accuracy by 2\% and 20\%, respectively), and at a fraction of the time other methods need (running at least 100 times faster).}
+\seplnabstract{Automated analysis of Spanish poetry corpora lacks the richness of tools available for English. The existing options suffer from a number of issues: are limited to fixed-metre hendecasyllabic verses, are not publicly available, the syllabification procedure underneath is not thoroughly tested, and their speed is questionable. Within the context of the ERC POSTDATA Project, this paper introduces new methods to alleviate these concerns. For syllabification, we contribute with our own method and manually crafted corpus. For scansion, our approach is based on a heuristic for the application of rhetorical figures that alter metrical length. Experimental evaluation shows that both fixed-metre and mixed-metre poetry can be successfully analyzed, producing metrical patterns more accurately (increasing accuracy by 2\% and 15\%, respectively), and at a fraction of the time other methods need (running at least 100 times faster).}
 
 \firstpageno{1}
 
@@ -82,7 +82,7 @@ It is the extraction of these metrical patterns of stressed and unstressed sylla
 % }
 
 \section{Related Work}
-Manuals for metrical analysis of Spanish poetry exist at least since the 18th century \cite{caparros1975contribucion}, although the foundational work and subsequent refined guides for modern analysis would take another century to appear (see, e.g., \cite{bello1859principios}; \cite{navarro1991metrica}; \cite{caparros1993metrica}). Despite such a long and rich tradition, not many computational tools have been created to assist scholars in the annotation and analysis of Spanish poetry. With ever increasing corpora sizes and the popularization of distant reading techniques, the possibility of automating part of the analysis became very appealing. Although solutions exist, they are either incomplete, not suitable for Spanish \cite{hartman2005scandroid,agirrezabal2016zeuscansion}, or not reproducible. The first of such methods was introduced by Gervás in 2000 as part of a larger system for the automatic generation of metrical poetry \cite{gervas2000logic}. In his work, Gervás uses Definite Clause Grammars in the logic programming language Prolog to model the division of a word into its constituents syllables, adding additional predicates to handle synaloepha and synaeresis. Once a metrical pattern is calculated, is matched against a repository of metrical templates and the best match is returned. There are two issues with this approach: first, all words are assigned their correct orthographic stress regardless of the part of speech. Secondly, all synaloephas are applied indiscriminately since the actual metrical pattern calculated is never returned. How this repository is built is not entirely clear. He reported 88.73\% per-line accuracy on a corpus of poems from the Spanish Golden Age period. We could not reproduce the figure since neither the code nor the dataset are publicly available at the moment.
+Manuals for metrical analysis of Spanish poetry exist at least since the 18th century \cite{caparros1975contribucion}, although the foundational work and subsequent refined guides for modern analysis would take another century to appear \cite{bello1859principios,navarro1991metrica,caparros1993metrica}. Despite such a long and rich tradition, not many computational tools have been created to assist scholars in the annotation and analysis of Spanish poetry. With ever increasing corpora sizes and the popularization of distant reading techniques \cite{moretti2013distant,jockers2013macroanalysis}, the possibility of automating part of the analysis became very appealing. Although solutions exist, they are either incomplete, not suitable for Spanish \cite{hartman2005scandroid,agirrezabal2016zeuscansion}, or not reproducible. The first of such methods was introduced by Gervás in 2000 as part of a larger system for the automatic generation of metrical poetry \cite{gervas2000logic}. In his work, Gervás uses Definite Clause Grammars in the logic programming language Prolog to model the division of a word into its constituents syllables, adding additional predicates to handle synaloepha and synaeresis. Once a metrical pattern is calculated, is matched against a repository of metrical templates and the best match is returned. There are two issues with this approach: first, all words are assigned their correct orthographic stress regardless of the part of speech. Secondly, all synaloephas are applied indiscriminately since the actual metrical pattern calculated is never returned. How this repository is built is not entirely clear. He reported 88.73\% per-line accuracy on a corpus of poems from the Spanish Golden Age period. We could not reproduce the figure since neither the code nor the dataset are publicly available at the moment.
 
 A more modern approach was introduced in 2017 by Navarro-Colorado \cite{navarro2017metrical}. He built a rule-based system leveraging the morphological analyzer in Freeling \cite{navarro2017metrical,padro2012freeling} and focused on resolving metrical ambiguities. In his method, after splitting words into syllables and assigning stress according to their PoS, the possible synaloephas and diaeresis are marked and applied, ignoring synaereses. This happens according to a knowledge base with probabilities for the different metrical patterns. The knowledge base is built offline from a large corpus\footnote{It is not exactly clear how large this corpus must be for his system to work.} and fed to the system, thus assuming a relationship between high probabilities and metricality. The system was evaluated on more than 1000 lines extracted from a corpus of 100 manually annotated sonnets from the Spanish Golden Age period as well. A considerable increase in per-line accuracy is reported at 95\%, contributing further with the first human annotated baseline reporting an inter-annotator agreement of 96\%. However, and setting aside the dependence of the system on a correct PoS tagging, as much as 20\% of the errors in the evaluation are due to problems related to the use of synaloephas and diaereses, mostly when combined. Moreover, there is no evidence nor evaluation of the ability of Navarro-Colorado's approach to properly assign metrical patterns for lines of verses other than hendecasyllables.
 
@@ -173,7 +173,7 @@ $+---+----+-$ 11 \\
 \end{subexamples}
 
 \section{Evaluation}
-One notably difficult aspect of benchmarking automated analysis of Spanish poetry is the lack of a gold standard reference corpus. In recent years, \cite{navarro2016metrical} is being used as a baseline. For syllabification, the best option is the limited corpus by \cite{agirrezabal2014assigning}\footnote{See \url{https://bitbucket.org/manexagirrezabal/syllabification_gold_standard/src/master/}}. Unfortunately, it contains some errors thus making it a not reliable source of truth. All evaluations were run on an computer with an Intel\textsuperscript{®} Core™ i7-8550U CPU @ 1.80GHz and 16GiB of DDR4 RAM memory. When reporting figures, accuracy is expressed in percentages and time in seconds.
+One notably difficult aspect of benchmarking automated analysis of Spanish poetry is the lack of a gold standard reference corpus. In recent years, the Corpus of Spanish Golden-Age Sonnets \cite{navarro2016metrical} is being used as the baseline. For syllabification, the best option is the limited corpus by \cite{agirrezabal2014assigning}\footnote{See \url{https://bitbucket.org/manexagirrezabal/syllabification_gold_standard/src/master/}}. Unfortunately, it contains some errors thus making it a not reliable source of truth. All evaluations were run on an computer with an Intel\textsuperscript{®} Core™ i7-8550U CPU @ 1.80GHz and 16GiB of DDR4 RAM memory. When reporting figures, accuracy is expressed in percentages and time in seconds.
 
 \subsection{Syllabification}
 Since the only resource for syllabification in Spanish contains errors, we were forced to build our own corpus for the evaluation of the syllabification algorithm. We collected more than 100k words using a combination of online resources\footnote{Namely, \url{https://educalingo.com}, \url{https://dirae.es/}, and \url{https://www.fundeu.es/}} into a corpus we named EDFU, and are releasing it under a Creative Commons license\footnote{See \url{https://github.com/linhd-postdata/edfu}}. All entries are manually reviewed for correction and compliance with Ríos Mestre and Fundéu recommendations.
@@ -181,11 +181,11 @@ Table \ref{table.1} shows the accuracy of the methods by Agirrezabal, Navarro-Co
 
 \begin{table} [htbp]
 \begin{center}
-\begin{tabular} {|l|c|}
+\begin{tabular} {lc}
   \hline\rule{-2pt}{15pt}
   {\bf Method} & {\bf Accuracy}\\
   \hline\rule{-4pt}{10pt}
-  Navarro-Colorado & 98.74 \\
+  Navarro-Colorado & 98.35 \\
   Agirrezabal & 98.06 \\
   Rantanplan (ours) & \textbf{99.99} \\
 \hline
@@ -195,46 +195,48 @@ Table \ref{table.1} shows the accuracy of the methods by Agirrezabal, Navarro-Co
 \end{table}
 
 \subsection{Scansion}
-In his original work describing his scansion approach, Navarro-Colorado uses a set of 100 poems (1,400 verses) extracted from \cite{navarro2016metrical} for the evaluation of his system. While the list of the exact 100 poems selected was not made public, we got access to it and are making it available\footnote{See our corpus downloader tool, Averell \url{https://github.com/linhd-postdata/averell/}}. Since the corpus is comprised entirely of hendecasyllable sonnets, we used it for the evaluation of fixed-metre poetry and compared our results against Agirrezabal's neural network approach, and Navarro-Colorado's rule-based algorithm. Gervás' logic programming method was not available but he kindly agreed to run its system against the fixed-metre corpora and report back the raw outputs. Table \ref{table.2} summarizes the results of per-line accuracy (evaluated as binary accuracy, entire metrical pattern matches divided by total number of lines of verse), showing that Rantaplan scores better than all other methods. The increase in accuracy is rather small but significant, while our method executes about 150 times faster than Navarro-Colorado's. We are marking the execution times for Gervás and Agirrezabal methods as not available.
+In his original work describing his scansion approach, Navarro-Colorado uses a set of 100 poems (1,400 verses) extracted from the Corpus of Spanish Golden-Age Sonnets \cite{navarro2016metrical} for the evaluation of his system. While the list of the exact 100 poems selected was not made public, the author of the paper kindly provided us with a copy\footnote{We are making this corpus available in our corpus downloader tool, Averell: \url{https://github.com/linhd-postdata/averell/}}. Since the corpus is comprised entirely of hendecasyllable sonnets, we used it for the evaluation of fixed-metre poetry and compared our results against Agirrezabal's neural network approach, and Navarro-Colorado's rule-based algorithm. Gervás' logic programming method was not available but he kindly agreed to run its system against the fixed-metre corpora and report back the raw outputs. Table \ref{table.2} summarizes the results of per-line accuracy (evaluated as binary accuracy, entire metrical pattern matches divided by total number of lines of verse), showing that Rantaplan scores better than all other methods. The increase in accuracy is rather small but significant, while our method executes about 150 times faster than Navarro-Colorado's. We are marking the execution times for Gervás and Agirrezabal methods as not available.
 
 \begin{table} [htbp]
 \begin{center}
-\begin{tabular} {|l|c|r|}
+\begin{tabular} {lcr}
   \hline\rule{-2pt}{15pt}
   {\bf Method} & {\bf Accuracy} & {\bf Time}\\
   \hline\rule{-4pt}{10pt}
-Gervás & 70.87 & N/A \\
-Navarro-Colorado & 94.44 & 3,248s \\
+Gervás\footnotemark & 70.88 & N/A \\
+Navarro-Colorado & 94.45 & 2,356s \\
 Agirrezabal & 90.84 & N/A\\
-Rantanplan (ours) & \textbf{96.22} & \textbf{21s} \\
+Rantanplan (ours) & \textbf{96.23} & \textbf{21s} \\
 \hline
 \end{tabular}
 \end{center}
 \caption{\label{table.2}Scores on Navarro-Colorado's fixed-metre 1,400 verses corpus. Best scores in bold.}
 \end{table}
+\footnotetext{Only 1,291 verses of the 1,400 verses corpus were evaluated by Gervás' method.}
 
-When compared against the entire manually checked part of \cite{navarro2016metrical} (around 10,000 verses from 730 poems), the difference in per-line accuracy increases. Execution time is also added to the comparison. Table \ref{table.3} shows per-line accuracy of our approach and Navarro-Colorado's system, showing a more notable increment in accuracy for our method, almost 20\% better in metrical pattern calculation, and more than 400 times faster in terms of execution time.
+When compared against the entire manually checked part of \cite{navarro2016metrical} (around 10,000 verses from 730 poems), the difference in per-line accuracy increases. Execution time is also added to the comparison. Table \ref{table.3} shows per-line accuracy of our approach and Navarro-Colorado's system, showing a similar increment in accuracy for our method, around 2\% better in metrical pattern calculation, and more than 300 times faster in terms of execution time.
 
 \begin{table} [htbp]
 \begin{center}
-\begin{tabular} {|l|c|r|}
+\begin{tabular} {lcr}
   \hline\rule{-2pt}{15pt}
   {\bf Method} & {\bf Accuracy} & {\bf Time}\\
   \hline\rule{-4pt}{10pt}
-Gervás & 67.59 & N/A \\
-Navarro-Colorado & 71.70 & 24,647s \\
-Rantanplan (ours) & \textbf{90.41} & \textbf{58s}\\
+Gervás\footnotemark & 67.56 & N/A \\
+Navarro-Colorado & 90.89 & 16,787s \\
+Rantanplan (ours) & \textbf{92.75} & \textbf{53s}\\
 \hline
 \end{tabular}
 \end{center}
 \caption{\label{table.3}Scores on Navarro-Colorado's fixed-metre 10,000 verses corpus. Best scores in bold.}
 \end{table}
+\footnotetext{Similarly, Gervás' method was only evaluated on 9,643 verses of the 10,000 verses corpus.}
 
-Lastly, for the evaluation of mixed-metre poetry we are using our own corpus of over 4,300 verses obtained from Carjaval's annotated anthology \cite{fernandez2003antologia}. Unfortunately, due to copyright issues we are unable to release our annotated corpus for mixed-metre poetry. Table \ref{table.4} shows results comparing performance of our method against \cite{navarro2017metrical}, showing that our approach is over 250 times faster and better suited to handle metrical stress that differ from a fixed value.
+Lastly, for the evaluation of mixed-metre poetry we are using our own corpus of over 4,300 verses obtained from Carjaval's annotated anthology \cite{fernandez2003antologia}. Unfortunately, due to copyright issues we are unable to release our annotated corpus for mixed-metre poetry. Table \ref{table.4} shows results comparing performance of our method against Navarro-Colorado's \cite{navarro2017metrical}, showing that our approach is over 250 times faster and better suited to handle metrical stress that differ from a fixed value with a 15\% increase in accuracy over Navarro-Colorado's system.
 
 \begin{table} [htbp]
 \begin{center}
-\begin{tabular} {|l|c|r|}
+\begin{tabular} {lcr}
   \hline\rule{-2pt}{15pt}
   {\bf Method} & {\bf Accuracy} & {\bf Time}\\
   \hline\rule{-4pt}{10pt}
@@ -246,10 +248,12 @@ Rantanplan (ours) & \textbf{65.02} & \textbf{27s} \\
 \caption{\label{table.4}Scores on Carvajal's mixed-metre 4,300 verses corpus. Best scores in bold.}
 \end{table}
 
-In addition to the improvements in accuracy for the different corpora, execution times seem to grow approximately linear with corpus size once we take into consideration that the loading time for the statistical model of Spanish in spaCy is 18 seconds, which gives execution times of 3 seconds for 1,400 verses, 9 seconds for 4,300 verses, and 40 seconds for 10,000 verses.
+In addition to the improvements in accuracy for the different corpora, execution times seem to grow approximately linear with corpus size once we take into consideration that the loading time for the statistical model of Spanish in spaCy is 18 seconds, which gives execution times of 3 seconds for 1,400 verses, 9 seconds for 4,300 verses, and 35 seconds for 10,000 verses.
 
 \section{Limitations}
-Despite the good scores obtained by our method, it is still based on a heuristic. Although thoroughly tested against different corpora, it could be the case that the heuristic we developed cannot account for changes in poetic production over time, thus making our system incapable of identifying accurately metrical patterns in modern expressions of poetry. We would need a more recent corpus to test this issue, but unfortunately most of these texts are still under copyright. A second important limitation of our method is the use of a PoS tagger that relies on a statistical language model optimized for speed, which in some cases assigns incorrect part of speech tags, thus impacting the stress of the words and producing inaccurate metrical patterns.
+Despite the good scores obtained by our method, it is still based on a heuristic. Although thoroughly tested against different corpora, it could be the case that the heuristic we developed cannot account for changes in poetic production over time, thus making our system incapable of identifying accurately metrical patterns in modern expressions of poetry. We would need a more recent corpus to test this issue, but unfortunately most of these texts are still under copyright.
+
+A second important limitation of our method is the use of a PoS tagger that relies on a statistical language model optimized for speed, which in some cases assigns incorrect part of speech tags, thus impacting the stress of the words and producing inaccurate metrical patterns.
 
 \section{Conclusions and Further Work}
 In this paper we have proposed methods for the automatic syllabification and scansion of Spanish poetry. Our syllabification method benefits from a carefully crafted new corpus, which we are releasing to the public. For scansion, two are the main advantages. First, we used a modern language model optimized for speed for the extraction of part of speech tags, improving execution times by a couple of orders of magnitude. Lastly, when extracting the actual metrical pattern we took the opposite approach to the previous state of the art and decided to apply all possible synaloephas and synaereses by default, only breaking them up when needed to match metrical length. This decision paid off  well in terms of accuracy since our method outperformed the rest in both fixed-metre and mixed-metre poetry.
@@ -262,10 +266,11 @@ Research for this paper has been achieved thanks to the Starting Grant research 
 \bibliographystyle{fullname}
 \bibliography{rantanplan_sepln_2020}
 
-\section{Appendix: Availability}
-A demo of the scansion system can be found online at \url{http://postdata.uned.es/poetrylab/}. All source code is available under an Apache License 2.0 in a code repository (\url{https://github.com/linhd-postdata/rantanplan/}) and as Python package in PyPI (\url{https://pypi.org/project/rantanplan/}).
-
 \section{Appendix: Reproducibility}
 To reproduce the results in this paper, please, refer to the next code repository: \url{https://github.com/linhd-postdata/rantanplan-evaluation}
+
+\section{Appendix: Availability}
+A demo of the scansion system can be found online at \url{http://postdata.uned.es/poetrylab/}. All source code is available under an Apache License 2.0 in a public code repository (\url{https://github.com/linhd-postdata/rantanplan/}) and as Python package in PyPI (\url{https://pypi.org/project/rantanplan/}).
+
 
 \end{document}
