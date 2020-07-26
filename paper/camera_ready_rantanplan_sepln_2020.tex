@@ -1,0 +1,278 @@
+\documentclass[a4paper,11pt,twocolumn,twoside]{article}
+\usepackage[dvips]{graphicx}
+\usepackage{tipa}
+\usepackage{sepln_en}
+\usepackage{fullname}
+\usepackage[english]{babel}  % es-nosectiondot,es-noindentfirst,es-tabla
+% Regular huperref + brakurl actually break citation style in bibliography
+% \usepackage{hyperref}
+% \usepackage[anythingbreaks]{breakurl}
+\usepackage{xurl}  % Package xurl seems to work fine in Overleaf
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage[noend]{algpseudocode}
+\usepackage[force]{covington}
+
+\usepackage[utf8]{inputenc}
+\input epsf
+
+
+\setlength\titlebox{4in} %esto por defecto
+
+\title{Rantanplan, Fast and Accurate Syllabification and Scansion of Spanish Poetry}
+
+\author {\textbf{Javier de la Rosa$^1$}, \textbf{Álvaro Pérez$^1$}, \\
+\textbf{Laura Hernández$^1$}, \textbf{Salvador Ros$^1$}, \textbf{Elena González-Blanco$^2$}\\
+$^1$Digital Humanities Innovation Lab, UNED, Madrid, Spain\\
+$^2$School of Human Sciences and Technology, IE University, Madrid, Spain\\ \{versae, alvaro.perez, laura.hernandez, sros\}@scc.uned.es,\\
+egonzalezblanco@faculty.ie.edu}
+
+\seplntranstitle{Rantanplan, silabación y escansión rápidas de poesía española}
+
+\seplnclave{acentuación, patrones métricos, escansión}
+
+\seplnresumen{El análisis automatizado de corpus de poesía española carece de la riqueza de las herramientas disponibles para el inglés. Las opciones existentes adolecen de una serie de problemas: se limitan a versos endecasílabos de métrica fija, no están disponibles públicamente, el procedimiento de silabación no está probado a fondo, y su velocidad es mejorable. Este artículo presenta nuevos métodos para contrarrestar estos problemas. Para la silabación, contribuimos con nuestro propio método, así como un corpus elaborado manualmente. Para la escansión, nuestro enfoque se basa en una heurística para la aplicación de figuras retóricas que alteran la longitud métrica. La evaluación experimental demuestra que tanto la poesía de métrica fija como la de métrica mixta se analizan con éxito, obteniéndose patrones métricos con mayor precisión (mejoras de un 2\% y un 15\%, respectivamente), y en una fracción del tiempo que otros métodos necesitan (ejecutándose al menos 100 veces más rápido).}
+
+
+\seplnkey{stress, metrical patterns, scansion}
+
+\seplnabstract{Automated analysis of Spanish poetry corpora lacks the richness of tools available for English. The existing options suffer from a number of issues: are limited to fixed-metre hendecasyllabic verses, are not publicly available, the syllabification procedure underneath is not thoroughly tested, and their speed is questionable. This paper introduces new methods to alleviate these concerns. For syllabification, we contribute with our own method and manually crafted corpus. For scansion, our approach is based on a heuristic for the application of rhetorical figures that alter metrical length. Experimental evaluation shows that both fixed-metre and mixed-metre poetry can be successfully analyzed, producing metrical patterns more accurately (increasing accuracy by 2\% and 15\%, respectively), and at a fraction of the time other methods need (running at least 100 times faster).}
+
+\firstpageno{1}
+
+\begin{document}
+
+% la siguiente instrucción sólo se debe usar si el abstract sobrescribe el texto
+% la longitud variará según se necesite
+
+\setlength\titlebox{19cm} % se aumenta el tamaño del espacio reservado para datos de título
+
+
+\label{firstpage} \maketitle
+
+%\begin{abstract}
+%Resumen del artículo con una sangría a izquierda y derecha de 0.32
+%cm, justificado por ambos lados, con tamaño de fuente 11.
+%
+%\end{abstract}
+
+\section{Introduction}
+Although different in nature, syllabification and scansion are loosely coupled by the underlying functioning of the prosody of a language. Syllabification is the splitting of words into their constituent units, syllables. Unlike English, where there is a weak correspondence between sounds and letters, spoken syllables in Spanish are the basis of the orthographic units of its words. These building blocks shape the stress patterns and rhythm of a language, as well as the poetic metre of its poetry. Once a word is split into syllables, Spanish orthography establishes somewhat rigid rules to assign stress and classifies the words according to the position of the last stressed syllable. There is generally only one stressed syllable per word\footnote{In this work we use hyphens as the syllabic separator for representation purposes, marking in bold the stressed syllable (e.g., `a-mo-\textbf{ro}-so').}, with few exceptions \cite{espanola2010ortografia}. Depending on the position of the stressed syllable, there are three categories of words:
+\begin{itemize}
+\item \textit{oxytone} words, when the stressed syllable is the last syllable of the word: `tam-\textbf{bor}'.
+\item \textit{paroxytone} words, when the stressed syllable is the one before the last syllable of the word: `\textbf{plan}-ta'.
+\item \textit{proparoxytone} words, when the stressed syllable lies two syllables from the end of the word: `\textbf{plá}-ta-no'.
+\end{itemize}
+Some word functions, such as prepositions, conjunctions, articles, and even some pronouns and determiners, are usually left unstressed for metrical purposes despite having stress assigned by orthographic rules \cite{caparros1993metrica}.
+
+This division of words into stressed and unstressed syllables is the basis for scansion, the process of determining the metrical pattern of a verse. It depends entirely on a correct assignment of stress to the syllables of the words of a verse. However, scansion is also affected by some rhetorical devices that might alter the counting of stresses and even syllables present in a verse, thus differentiating between metrical length and syllabic length. We can talk about phonological groups for the syllables in a metre, which may be affected by metrical phenomena. Possibly, the two most common of these figures in Spanish are synalepha and syneresis. While both imply the union of separate phonological groups, the former acts between the last syllable of a word and the first of the next, for example in `la amaba', `la' and `a' would be joined together. For the latter, the union occurs between the adjacent vowels within a word, `son-re-ír' can be then split as `son-reír' after syneresis. After applying these alterations, the number of syllables effectively shrinks for metrical purposes. Dieresis, on the other hand, is the metric phenomenon in which two vowels within the same syllable forming diphthongs are separated into different syllables, increasing the syllable count. Diereses tend to be graphically marked with a diacritical sign (\"{ }), although its use in modern poetry is becoming less common.  % \cite{torre2000metrica}.
+
+Following the definition and representation of Spanish metre given by \namecite{navarro2017metrical}, we consider the metre of a Spanish verse as a sequence of stressed and unstressed syllables \cite{quilis1969metrica,navarro1991metrica,caparros1993metrica}, where stressed syllables are marked with the plus symbol `$+$' and unstressed ones use the minus `$-$'. An extra unstressed symbol is added to the metrical representation of a verse when its last word is an oxytone, removed if a proparoxytone, or left unchanged if a paroxytone. Example \ref{example.1} shows a verse of 8 syllables and the resulting metrical pattern after applying the synalepha (denoted by `\textbottomtiebar{ }') and considering the stress of the last word.
+
+\begin{subexamples}\label{example.1}
+\textit{Cuando el alba me despierta} \\
+\textit{Cuan-d\textbottomtiebar{oe}l-\textbf{al}-ba-me-des-\textbf{pier}-ta} \\
+$--+---+-$ 8 \\
+(Miguel de Unamuno)
+\end{subexamples}
+
+We aim at automating and enhancing the extraction of these metrical patterns of stressed and unstressed syllables. The application of automated techniques enables corpus linguistic approaches over poetry corpora that would otherwise need to be annotated manually. At the pedagogical level, it would also allow for the generation of didactic resources for the teaching of poetry and its scansion procedures, as our method produces not only a single output but all the information it relies upon to making its decisions.
+% \parbox{6.5cm}{
+%     \textit{Escrito está en mi alma vuestro gesto} \\
+%     \textit{Es-\textbf{cri}-to\textbottomtiebar{ }es-\textbf{tá}-en-\textbf{mi\textbottomtiebar{ }al}-ma-vues-tro-\textbf{ges}-to} \\
+%     $-+-+-+---+-$ \\
+%     \rightline{{\rm --- Garcilaso de la Vega}}
+% }
+
+\section{Related Work}
+Manuals for metrical analysis of Spanish poetry exist at least since the 18th century, although the foundational work and subsequent refined guides for modern analysis would take another century to appear \cite{navarro1991metrica,caparros1993metrica}. Despite such a long and rich tradition, not many computational tools have been created to assist scholars in the annotation and analysis of Spanish poetry. With ever increasing corpora sizes and the popularization of distant reading techniques \cite{moretti2013distant}, the possibility of automating part of the analysis became very appealing. Although solutions exist, they are either incomplete, not suitable for Spanish, or not reproducible \cite{hartman2005scandroid,agirrezabal2016zeuscansion}. The first of such methods was introduced by \namecite{gervas2000logic} as part of a larger system for the automatic generation of metrical poetry. In his work, Gervás uses Definite Clause Grammars in the logic programming language Prolog to model the division of a word into its constituents syllables, adding additional predicates to handle synalepha and syneresis. Once a metrical pattern is calculated, is matched against a repository of metrical templates and the best match is returned. There are two issues with this approach: first, all words are assigned their correct lexical stress regardless of the part of speech. Secondly, all synalephas are applied indiscriminately since the actual metrical pattern calculated is never returned. How this repository is built is not entirely clear. He reported 88.73\% per-line accuracy on a corpus of poems from the Spanish Golden Age period. We could not reproduce the figure since neither the code nor the dataset are publicly available at the moment.
+
+A more modern approach was introduced by \namecite{navarro2017metrical} as a rule-based system leveraging the morphological analyzer in Freeling \cite{padro2012freeling} and focused on resolving metrical ambiguities. In his method, after splitting words into syllables and assigning stress according to their PoS, the possible synalephas and dieresis are marked and applied, ignoring synereses. This happens according to a knowledge base with probabilities for the different metrical patterns. The knowledge base is built offline from a large corpus\footnote{It is not exactly clear how large this corpus must be for his system to work.} and fed to the system, thus assuming a relationship between high probabilities and metricality. The system was evaluated on more than 1000 lines extracted from a corpus of 100 manually annotated sonnets from the Spanish Golden Age period as well. A considerable increase in per-line accuracy is reported at 95\%, contributing further with the first human annotated baseline reporting an inter-annotator agreement of 96\%. However, and setting aside the dependence of the system on a correct PoS tagging, as much as 20\% of the errors in the evaluation are due to problems related to the use of synalephas and diereses, mostly when combined. Moreover, there is no evidence nor evaluation of the ability of Navarro-Colorado's approach to properly assign metrical patterns for lines of verses other than hendecasyllables.
+
+Shortly thereafter, \namecite{agirrezabal2017comparison} experimented with the idea of applying neural networks to predict the metrical pattern of lines of verses. He designed a character-based bidirectional long short term (BiLSTM) neural network with conditional random fields and trained it on an similar corpus. A prior process of feature engineering added to the syllabification transformed each line of verse into a feature vector that kept the syllabic split, the surroundings of each syllable, PoS tags, and even stresses. He reported a per-line accuracy of 90.84\%. Unfortunately, his approach is solely focused on predicting a metrical pattern from a very rich transformation of a verse, loosing in the process all information about phonological groups, individual syllabic stress, and synalephas, diereses, and synereses if any.
+
+Although all approaches rely on a syllabification algorithm, Gervás' system was not made public, and there is no evaluation of Navarro-Colorado's although all his code was made publicly available to experiment with. To the best of our knowledge, the only published syllabification algorithm for Spanish was introduced by \namecite{agirrezabal2014assigning} as an extension of his work in the English language. It used a finite state machine to split words into syllables and assign stress following the sonority hierarchy and maximum onset principle. However, we found some issues in the syllables of words present in the syllabification corpus employed for evaluation. Based on \namecite{mestre1998transcripcion}, we disagree in the form some of the words are split into syllables, which could bias the accuracy of his method.
+
+\section{Fast Scansion}
+The aforementioned limitations guided the design of our own syllabification and scansion system, Rantanplan, which is comprised of four modules that work together to perform scansion of both fixed-metre as well as mixed-metre poetry: PoS tagger, syllabification, stress assignment, and metrical adjustment. The general algorithm, described in algorithm \ref{alg:algo.1}, operates at the line level with a sequence of words. First, for each word in a line of verse the PoS information is extracted and the word split into syllables (lines 2-3 in algorithm \ref{alg:algo.1}). Combining the PoS information and the syllabified word, the stress for each syllable is assigned according to the rules for oxytone, paroxytone, and proparoxytone words, plus a few exceptions detailed below (line 4). In the process, all possible synalephas and synereses are marked at the syllable level. With the enriched syllabic data, a new sequence of phonological groups is created by applying all possible synalephas and synereses and keeping the information about the stress positions (line 6). This sequence of phonological groups is translated directly into a metrical pattern (line 7), since each phonological group represents a prosodic unit of pronunciation. The only consideration to factor in is the stress of the ending word, so an extra symbol could be added or subtracted accordingly when necessary. From here, two situations can occur:
+\begin{enumerate}
+\item The expected metrical length is not known, in which case the calculated pattern is returned (line 14).
+\item The expected metrical length is known and its value greater than the length of the calculated pattern (lines 8-13). This means some of the applied synalephas and synereses must be undone until both lengths match. The metrical adjustment module will try every option iteratively giving priority based on a heuristic. For each attempt, a new metrical pattern and its corresponding length is calculated and checked against the expected metrical length. If no match is found, the last pattern calculated is returned.
+\end{enumerate}
+
+\begin{algorithm} \label{alg:algo.1}
+\SetAlgoLined
+\KwIn{A sequence $\mathcal{W}$ of words $\langle w_1, w_2, \ldots, w_n \rangle$}
+\KwIn{A value $\mathit{length}$ for the metrical length expected (optional)}
+\KwOut{A sequence $\langle s_1, s_2, \ldots, s_{\mathcal{L}} \rangle$ of booleans expressing the metrical pattern}
+ \For {$w_i \in \mathcal{W}$}{
+  $tag_i$ $\gets$ pos($w_i$)\\
+  $syllables_i$ $\gets$ syllabify($w_i$)\\
+  $stresses_i$ $\gets$ stress($syllables_i$, $tag_i$)\\
+ }
+ $groups$ $\gets$ phonological($syllables$, $stresses$) \\
+ $pattern$ $\gets$ transform($groups$)\\
+ \If{$\mathit{length}$}{
+  \While{$\vert pattern \vert < \mathit{length}$}{
+   $g \gets$ generate\_phonological($\mathcal{W}$)\\
+   $pattern$ $\gets$ transform($g$)\\
+  }
+ }
+ \Return{pattern}
+ \caption{Scansion procedure}
+\end{algorithm}
+
+\subsection{PoS tagger}
+We built Rantanplan on top of the industrial-strength NLP framework spaCy for speed \cite{honnibal2017spacy}. As mentioned previously, in Spanish some words are stressed depending on their function in the sentence, hence the need for a proper part of speech tagger. AnCora \cite{taule2008ancora}, the gold standard corpus many modern statistical language models are trained on for PoS tagging of Spanish texts, splits most affixes thus causing some failures in the tags it assigns on prediction. To circumvent this limitation and to ensure clitics\footnote{Syntactically independent but phonologically dependent morphemes that appear together in a word, e.g., in `cógemelo', both `me' and `lo' are pronouns written together with the verb `coge'} were handled properly, we integrated Freeling's affixes rules via a custom built pipeline for spaCy. The resulting package, spacy-affixes\footnote{See \url{https://github.com/linhd-postdata/spacy-affixes/}}, splits words with affixes before assigning PoS, and can be plugged in to a regular spaCy pipeline loading one of the statistical models for Spanish. In our approach, only suffixes on verbs are enabled in spacy-affixes to guarantee clitics are handled adequately by spaCy and PoS tags are assigned correctly.
+
+\subsection{Syllabification}
+Our method then follows a rule-based algorithm inspired by \namecite{mestre1998transcripcion}, \namecite{caparros1993metrica} and \namecite{navarro1991metrica} to split words into syllables. The procedure relies heavily on regular expressions to extract the letter groups that form the syllables. It is comprised of three steps.
+\begin{enumerate}
+\item Pre-syllabification rules are applied, which include the detection of consonant groups other than double `l', as in `aislar', and the handling of the prefixes `sin-' and `des-' when followed by consonants, as in `deshielo'.
+\item Regular letter clusters are identified and separated from the rest.
+\item Post-syllabification exceptions for consonant clusters and diphthongs are applied.
+\end{enumerate}
+Apart from the official rules for syllabification \cite{espanola2010ortografia}, there are cases with more than one correct way to proceed. The first of these cases was the `tl' group. Let's take the word `atlántico' for example, its syllabification changes according to the territory\footnote{See \url{https://www.fundeu.es/consulta/at-lan-ti-co-o-a-tlan-ti-co-12213/}}. We decided not to split the group `tl' since most of the Spanish speakers around the world do not separate it. In the case of words of Nahuatl origin this separation should not be made either.
+Compounds words and words with an `h' in between were also challenging. As an example of the former let's take the word `reutilizar'. Although intuitively it may seem that the prefix `re-' should be separated from the rest of the word, the Fundéu\footnote{The Fundéu is a foundation created from the Department of Urgent Spanish of the EFE Agency. See \url{https://twitter.com/Fundeu/status/1182226555457724416}} recommends not to do it this way, splitting instead as `reu-ti-li-zar'. Similarly, the `h' in a middle position does not split diphthongs, so `desahijar' would be syllabified as `de-sahi-jar', which might feel odd at a first pass but it actually agrees with the pronunciation of the word.
+Moreover, we also included possible diereses as part of our alternative syllabification exceptions. One such word is `hiato'\footnote{Several examples can be found at \url{http://elies.rediris.es/elies4/Fon8.htm}} which can be split either as `hia-to' or `hi-a-to'. As noted by \namecite{navarro2017metrical}, another common case is the word `suave', which poets tend to apply dieresis to thus resulting in 'sua-ve' instead of the default split as `su-a-ve'.  Therefore, our method relies on a list of words with alternative syllabifications compiled from \namecite{mestre1998transcripcion}. These alternatives are only taken into account by the metrical adjustment module.
+
+\subsection{Stress assignment and phonological groups}
+Once syllables and part of speech of a word are extracted, stress can be assigned. The assignment of stress follows very closely the rules defined in \namecite{espanola2010ortografia}, adding exceptions for certain parts of speech, consonant groups, and words that are usually stressed but are not for metrical reasons. The sequence of phonological groups that will be used to extract the metrical pattern is calculated by applying all possible synereses and synalephas to the list of syllables of words per line, and propagating the stress information when needed. For example, the words `me ama' are split into the syllables `me-\textbf{a}-ma', and after applying synalepha the resulting phonological groups, `\textbf{m\textbottomtiebar{ea}}-ma', keep the stress in place. Word ends are also marked since they are needed to adjust the length of the metrical pattern according to the position of the stress of the last word. Phonological groups are then transformed into a metrical pattern representation and returned if the expected metrical length of the verse is not known beforehand.
+
+\subsection{Metrical adjustment}
+However, there are situations where the expected metrical length is known, such as processing a corpus of sonnets which tend to be hendecasyllables. In cases like this, verses with applied synalephas or synereses but a metrical length lower than the expected would trigger the adjustment module.
+In example \ref{example.2}, the expected metrical length is 11 but our system returns 9, thus triggering the metrical adjustment module.
+
+\begin{subexamples}\label{example.2}
+\textit{loor a mi autor, y al que leyere} \\
+\textit{\textbf{l\textbottomtiebar{oo}r}-a-m\textbottomtiebar{ia}u-\textbf{tor}-\textbottomtiebar{ya}l-que-le-\textbf{ye}-re} \\
+$+--+---+-$ $9 < 11$ \\
+(Juan de Timoneda)
+\end{subexamples}
+
+This means that $11 - 9 = 2$ of the applied synalephas and synereses must be undone until both lengths match. The metrical adjustment module tries every possible metrical pattern combining synereses, synalephas, and alternative syllabifications. Priority is given to keep the synalephas since they are rarely broken, and syneresis are usually undone. The same happens for the alternative syllabifications, which deals with dieresis and adds more combinations to check for. A special case adding possibilities to the search space is the handling of synalephas between words with an initial `h' and vowel ending words.
+Up to the 16th century, the initial `h' in words was aspired instead of silent. This depends on the etymology of some words. For example, in the verse `\textit{cubra de nieve la hermosa cumbre}' (see example \ref{example.3}) there should not be synalepha between `la' and `hermosa` since `hermosa' evolved from the Latin `fermosa' and as such a synalepha was not possible at all. To this day, this remains an option to the author, who can decide whether or not to apply a synalepha in such cases.
+
+\begin{subexamples}\label{example.3}
+\textit{cubra de nieve la hermosa cumbre}\\
+\textit{\textbf{cu}-bra-de-\textbf{nie}-ve-la-her-\textbf{mo}-sa-\textbf{cum}-bre} \\
+$+--+---+-+-$ 11 \\
+(Garcilaso de la Vega) \\
+\end{subexamples}
+
+For each attempt, a new metrical pattern and length is calculated and checked against the expected metrical length. If no match is found, the last pattern calculated is returned. For the verse in example \ref{example.2}, the generated possible metrical patterns are shown in example \ref{example.4}. Pattern \ref{example.4a}, with no synereses and one synalepha between `y' and `al' would be generated first and returned afterwards. Since the metrical pattern has the correct length it is returned as such and the generation stops, saving the time it takes to generate any other possible pattern. This is also a limitation of our approach since more than one correct metrical pattern can be generated that matches the desired length.
+
+
+\begin{subexamples}[preamble={\textit{loor a mi autor, y al que leyere}}]\label{example.4}
+\item\label{example.4a}
+\textit{lo-\textbf{or}-a-mi-au-\textbf{tor}-\textbottomtiebar{ya}l-que-le-\textbf{ye}-re} \\
+$-+---+---+-$ 11 \\
+\item\label{example.4b}
+\textit{lo-\textbf{or}-a-m\textbottomtiebar{ia}u-\textbf{tor}-y-al-que-le-\textbf{ye}-re} \\
+$-+--+----+-$ 11 \\
+\item\label{example.4c}
+\textit{\textbf{l\textbottomtiebar{oo}r}-a-mi-au-\textbf{tor}-y-al-que-le-\textbf{ye}-re} \\
+$+---+----+-$ 11 \\
+\end{subexamples}
+
+\section{Evaluation}
+One notably difficult aspect of benchmarking automated analysis of Spanish poetry is the lack of a gold standard reference corpus. In recent years, the Corpus of Spanish Golden-Age Sonnets by \namecite{navarro2016metrical} is being used as the baseline. For syllabification, the best option is the limited corpus by \namecite{agirrezabal2014assigning}\footnote{See \url{https://bitbucket.org/manexagirrezabal/syllabification_gold_standard/src/master/}}. Unfortunately, it contains some errors thus making it a not reliable source of truth. All evaluations were run on an computer with an Intel\textsuperscript{®} Core™ i7-8550U CPU @ 1.80GHz and 16GiB of DDR4 RAM memory. When reporting figures, accuracy is expressed in percentages and time in seconds.
+
+\subsection{Syllabification}
+Since the only resource for syllabification in Spanish contains errors, we were forced to build our own corpus for the evaluation of the syllabification algorithm. We collected more than 100k words using a combination of online resources\footnote{Namely, \url{https://educalingo.com}, \url{https://dirae.es/}, and \url{https://www.fundeu.es/}} into a corpus we named EDFU, and are releasing it under a Creative Commons license\footnote{See \url{https://github.com/linhd-postdata/edfu}}. All entries are manually reviewed for correction and compliance with Ríos Mestre and Fundéu recommendations.
+Table \ref{table.1} shows the accuracy of the methods by Agirrezabal \shortcite{agirrezabal2014assigning}, Navarro-Colorado \shortcite{navarro2016metrical}, and ours when run against EDFU. Our method performs almost perfectly, more than one percentual point of gain over the others. No time comparison is made since all times are fairly similar.
+
+\begin{table} [htbp]
+\begin{center}
+\begin{tabular} {lc}
+  \hline\rule{-2pt}{15pt}
+  {\bf Method} & {\bf Accuracy}\\
+  \hline\rule{-4pt}{10pt}
+  Navarro-Colorado & 98.35 \\
+  Agirrezabal & 98.06 \\
+  Rantanplan (ours) & \textbf{99.99} \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{table.1}Scores on EDFU syllabification corpus. Best scores in bold.}
+\end{table}
+
+\subsection{Scansion}
+In his original work describing his scansion approach, Navarro-Colorado uses a set of 100 poems (1,400 verses) extracted from the Corpus of Spanish Golden-Age Sonnets \shortcite{navarro2016metrical} for the evaluation of his system. While the list of the exact 100 poems selected was not made public, the author of the paper kindly provided us with a copy\footnote{We are making this corpus available in our corpus downloader tool, Averell: \url{https://github.com/linhd-postdata/averell/}}. Since the corpus is comprised entirely of hendecasyllable sonnets, we used it for the evaluation of fixed-metre poetry and compared our results against Agirrezabal's neural network approach, and Navarro-Colorado's rule-based algorithm. Gervás' logic programming method was not available but he kindly agreed to run its system against the fixed-metre corpora and report back the raw outputs. Table \ref{table.2} summarizes the results of per-line accuracy (evaluated as binary accuracy, entire metrical pattern matches divided by total number of lines of verse), showing that Rantaplan scores better than all other methods. The increase in accuracy is rather small but significant, while our method executes about 150 times faster than Navarro-Colorado's. We are marking the execution times for Gervás and Agirrezabal methods as not available.
+
+\begin{table} [htbp]
+\begin{center}
+\begin{tabular} {lcr}
+  \hline\rule{-2pt}{15pt}
+  {\bf Method} & {\bf Accuracy} & {\bf Time}\\
+  \hline\rule{-4pt}{10pt}
+Gervás\footnotemark & 70.88 & N/A \\
+Navarro-Colorado & 94.45 & 2,356s \\
+Agirrezabal & 90.84 & N/A\\
+Rantanplan (ours) & \textbf{96.23} & \textbf{21s} \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{table.2}Scores on Navarro-Colorado's fixed-metre 1,400 verses corpus. Best scores in bold.}
+\end{table}
+\footnotetext{Only 1,291 verses of the 1,400 verses corpus were evaluated by Gervás' method.}
+
+When compared against the entire manually checked part of  Navarro-Colorado's corpus \shortcite{navarro2016metrical}, around 10,000 verses from 730 poems, the difference in per-line accuracy increases. Execution time is also added to the comparison. Table \ref{table.3} shows per-line accuracy of our approach and Navarro-Colorado's system, showing a similar increment in accuracy for our method, around 2\% better in metrical pattern calculation, and more than 300 times faster in terms of execution time.
+
+\begin{table} [htbp]
+\begin{center}
+\begin{tabular} {lcr}
+  \hline\rule{-2pt}{15pt}
+  {\bf Method} & {\bf Accuracy} & {\bf Time}\\
+  \hline\rule{-4pt}{10pt}
+Gervás\footnotemark & 67.56 & N/A \\
+Navarro-Colorado & 90.89 & 16,787s \\
+Rantanplan (ours) & \textbf{92.75} & \textbf{53s}\\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{table.3}Scores on Navarro-Colorado's fixed-metre 10,000 verses corpus. Best scores in bold.}
+\end{table}
+\footnotetext{Similarly, Gervás' method was only evaluated on 9,643 verses of the 10,000 verses corpus.}
+
+Lastly, for the evaluation of mixed-metre poetry we are using our own corpus of over 4,300 verses obtained from Carjaval's annotated anthology \shortcite{fernandez2003antologia}. Unfortunately, due to copyright issues we are unable to release our annotated corpus for mixed-metre poetry. Table \ref{table.4} shows results comparing performance of our method against Navarro-Colorado's \shortcite{navarro2017metrical}, showing that our approach is over 250 times faster and better suited to handle metrical stress that differ from a fixed value with a 15\% increase in accuracy over Navarro-Colorado's system.
+
+\begin{table} [htbp]
+\begin{center}
+\begin{tabular} {lcr}
+  \hline\rule{-2pt}{15pt}
+  {\bf Method} & {\bf Accuracy} & {\bf Time}\\
+  \hline\rule{-4pt}{10pt}
+Navarro-Colorado & 49.38 & 7,484s \\
+Rantanplan (ours) & \textbf{65.02} & \textbf{27s} \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{table.4}Scores on Carvajal's mixed-metre 4,300 verses corpus. Best scores in bold.}
+\end{table}
+
+In addition to the improvements in accuracy for the different corpora, execution times seem to grow approximately linear with corpus size once we take into consideration that the loading time for the statistical model of Spanish in spaCy is 18 seconds, which gives execution times of 3 seconds for 1,400 verses, 9 seconds for 4,300 verses, and 35 seconds for 10,000 verses.
+
+\section{Limitations}
+Despite the good scores obtained by our method, it is still based on a heuristic. Although thoroughly tested against different corpora, it could be the case that the heuristic we developed cannot account for changes in poetic production over time, thus rendering our system unable to accurately assess metrical patterns in modern expressions of poetry. We would need a more recent corpus to test this issue, but unfortunately most of these texts are still under copyright.
+
+A second important limitation of our method is the use of a PoS tagger that relies on a statistical language model optimized for speed, which in some cases assigns incorrect part of speech tags, thus impacting the stress of the words and producing inaccurate metrical patterns.
+
+\section{Conclusions and Further Work}
+In this paper we have proposed methods for the automatic syllabification and scansion of Spanish poetry. Our syllabification method benefits from a carefully crafted new corpus, which we are releasing to the public. For scansion, two are the main contributions. First, we used a modern language model optimized for speed for the extraction of part of speech tags, improving execution times by a couple of orders of magnitude. Lastly, when extracting the actual metrical pattern we took the opposite approach to the previous state of the art and decided to apply all possible synalephas and synereses by default, only breaking them up when needed to match metrical length. This decision paid off  well in terms of accuracy since our method outperformed the rest in both fixed-metre and mixed-metre poetry.
+
+We plan to continue improving Rantanplan and explore alternatives, specially using statistical language models to produce end-to-end metrical patterns further improving speed. Moreover, the output produced by our method will eventually be machine readable, interoperable, and ready to be ingested into a triple store compliant with the POSTDATA Project network of ontologies.
+
+\section*{Acknowledgements}
+This research was supported by the project Poetry Standardization and Linked Open Data (POSTDATA) (ERC-2015-STG-679528) obtained by Elena González-Blanco and funded by an European Research Council (\url{https://erc.europa.eu}) Starting Grant under the Horizon2020 Program of the European Union.
+
+\bibliographystyle{fullname}
+\bibliography{rantanplan_sepln_2020}
+
+\appendix
+\section{Appendix: Availability}
+A demo of Rantanplan can be found online at \url{http://postdata.uned.es/poetrylab/}. All source code is available under an Apache License 2.0 in a public code repository (\url{https://github.com/linhd-postdata/rantanplan/}) and as a Python package in PyPI (\url{https://pypi.org/project/rantanplan/}).
+
+\section{Appendix: Reproducibility}
+To reproduce the results in this paper, please, refer to the next code repository: \url{https://github.com/linhd-postdata/rantanplan-evaluation}.
+
+\end{document}

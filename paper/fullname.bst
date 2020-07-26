@@ -5,7 +5,7 @@
 
 %%% Intended for use with the style file "fullname.sty"
 
-%%% Fri Jan  6 12:39:41 1995	
+%%% Fri Jan  6 12:39:41 1995
 %%% See note below (in function sort.format.names) for alternate
 %%% reference sorting method for names with particles.
 
@@ -246,7 +246,7 @@ FUNCTION {format.names}
   numnames 'namesleft :=
     { namesleft #0 > }
 
-    { s nameptr 
+    { s nameptr
 	   nameptr #1 >
               { "{f.~}{vv~}{ll}{, jj}" }
               { "{vv~}{ll}{, jj}{, f.}" }
@@ -822,7 +822,7 @@ FUNCTION {inproceedings}
 
 FUNCTION {conference} { inproceedings }
 
-%%% SMS  Thu Aug  4 14:45:06 1994	
+%%% SMS  Thu Aug  4 14:45:06 1994
 %%% Moved address to end of entry, rather than between organization
 %%% and date, by deleting lines marked %**
 
@@ -881,7 +881,7 @@ FUNCTION {mastersthesis}
 
 FUNCTION {misc}
 { output.bibitem
-  format.authors output 
+  format.authors output
   new.block
   format.year.label output
   new.block
@@ -1082,7 +1082,7 @@ FUNCTION {format.lab.names}
     { numnames #2 =
         { s #1 "{vv }{ll }and " format.name$ s #2 "{vv }{ll}" format.name$ *
         }
-        { numnames #3 = 
+        { numnames #3 =
              { s #1 "{vv }{ll}, " format.name$ s #2 "{vv }{ll}, and "
 		format.name$ * s #3 "{vv }{ll}" format.name$ * }
              { s #1 "{vv }{ll }\bgroup et al.\egroup " format.name$ }
@@ -1094,7 +1094,7 @@ FUNCTION {format.lab.names}
 
 }
 
-%%% SMS   Thu Aug  4 14:39:01 1994	
+%%% SMS   Thu Aug  4 14:39:01 1994
 %%% Modified the label functions below so that they do not limit key
 %%% and organization labels to three characters. Original lines left
 %%% in as comments, preceded by %**

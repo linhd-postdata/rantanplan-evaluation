@@ -52,7 +52,7 @@
  \sfcode`\.=1000\relax}
 \let\endthebibliography=\endlist
 
-\def\@lbibitem[#1]#2{\item[]\if@filesw 
+\def\@lbibitem[#1]#2{\item[]\if@filesw
       { \def\protect##1{\string ##1\space}\immediate
         \write\@auxout{\string\bibcite{#2}{#1}}\fi\ignorespaces}}
 
