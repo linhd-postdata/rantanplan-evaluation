@@ -68,12 +68,12 @@ This division of words into stressed and unstressed syllables is the basis for s
 
 Following the definition and representation of Spanish metre given by \namecite{navarro2017metrical}, we consider the metre of a Spanish verse as a sequence of stressed and unstressed syllables \cite{quilis1969metrica,navarro1991metrica,caparros1993metrica}, where stressed syllables are marked with the plus symbol `$+$' and unstressed ones use the minus `$-$'. An extra unstressed symbol is added to the metrical representation of a verse when its last word is an oxytone, removed if a proparoxytone, or left unchanged if a paroxytone. Example \ref{example.1} shows a verse of 8 syllables and the resulting metrical pattern after applying the synalepha (denoted by `\textbottomtiebar{ }') and considering the stress of the last word.
 
-\begin{subexamples}\label{example.1}
+\begin{example}\label{example.1}
 \textit{Cuando el alba me despierta} \\
 \textit{Cuan-d\textbottomtiebar{oe}l-\textbf{al}-ba-me-des-\textbf{pier}-ta} \\
 $--+---+-$ 8 \\
 (Miguel de Unamuno)
-\end{subexamples}
+\end{example}
 
 We aim at automating and enhancing the extraction of these metrical patterns of stressed and unstressed syllables. The application of automated techniques enables corpus linguistic approaches over poetry corpora that would otherwise need to be annotated manually. At the pedagogical level, it would also allow for the generation of didactic resources for the teaching of poetry and its scansion procedures, as our method produces not only a single output but all the information it relies upon to making its decisions.
 % \parbox{6.5cm}{
@@ -142,25 +142,24 @@ Once syllables and part of speech of a word are extracted, stress can be assigne
 However, there are situations where the expected metrical length is known, such as processing a corpus of sonnets which tend to be hendecasyllables. In cases like this, verses with applied synalephas or synereses but a metrical length lower than the expected would trigger the adjustment module.
 In example \ref{example.2}, the expected metrical length is 11 but our system returns 9, thus triggering the metrical adjustment module.
 
-\begin{subexamples}\label{example.2}
+\begin{example}\label{example.2}
 \textit{loor a mi autor, y al que leyere} \\
 \textit{\textbf{l\textbottomtiebar{oo}r}-a-m\textbottomtiebar{ia}u-\textbf{tor}-\textbottomtiebar{ya}l-que-le-\textbf{ye}-re} \\
 $+--+---+-$ $9 < 11$ \\
 (Juan de Timoneda)
-\end{subexamples}
+\end{example}
 
 This means that $11 - 9 = 2$ of the applied synalephas and synereses must be undone until both lengths match. The metrical adjustment module tries every possible metrical pattern combining synereses, synalephas, and alternative syllabifications. Priority is given to keep the synalephas since they are rarely broken, and syneresis are usually undone. The same happens for the alternative syllabifications, which deals with dieresis and adds more combinations to check for. A special case adding possibilities to the search space is the handling of synalephas between words with an initial `h' and vowel ending words.
 Up to the 16th century, the initial `h' in words was aspired instead of silent. This depends on the etymology of some words. For example, in the verse `\textit{cubra de nieve la hermosa cumbre}' (see example \ref{example.3}) there should not be synalepha between `la' and `hermosa` since `hermosa' evolved from the Latin `fermosa' and as such a synalepha was not possible at all. To this day, this remains an option to the author, who can decide whether or not to apply a synalepha in such cases.
 
-\begin{subexamples}\label{example.3}
+\begin{example}\label{example.3}
 \textit{cubra de nieve la hermosa cumbre}\\
 \textit{\textbf{cu}-bra-de-\textbf{nie}-ve-la-her-\textbf{mo}-sa-\textbf{cum}-bre} \\
 $+--+---+-+-$ 11 \\
 (Garcilaso de la Vega) \\
-\end{subexamples}
+\end{example}
 
 For each attempt, a new metrical pattern and length is calculated and checked against the expected metrical length. If no match is found, the last pattern calculated is returned. For the verse in example \ref{example.2}, the generated possible metrical patterns are shown in example \ref{example.4}. Pattern \ref{example.4a}, with no synereses and one synalepha between `y' and `al' would be generated first and returned afterwards. Since the metrical pattern has the correct length it is returned as such and the generation stops, saving the time it takes to generate any other possible pattern. This is also a limitation of our approach since more than one correct metrical pattern can be generated that matches the desired length.
-
 
 \begin{subexamples}[preamble={\textit{loor a mi autor, y al que leyere}}]\label{example.4}
 \item\label{example.4a}
@@ -193,7 +192,7 @@ Table \ref{table.1} shows the accuracy of the methods by Agirrezabal \shortcite{
 \hline
 \end{tabular}
 \end{center}
-\caption{\label{table.1}Scores on EDFU syllabification corpus. Best scores in bold.}
+\caption{\label{table.1}Scores on EDFU syllabification corpus. Best score in bold}
 \end{table}
 
 \subsection{Scansion}
@@ -212,7 +211,7 @@ Rantanplan (ours) & \textbf{96.23} & \textbf{21s} \\
 \hline
 \end{tabular}
 \end{center}
-\caption{\label{table.2}Scores on Navarro-Colorado's fixed-metre 1,400 verses corpus. Best scores in bold.}
+\caption{\label{table.2}Scores on Navarro-Colorado's fixed-metre 1,400 verses corpus. Best scores in bold}
 \end{table}
 \footnotetext{Only 1,291 verses of the 1,400 verses corpus were evaluated by Gervás' method.}
 
@@ -230,11 +229,13 @@ Rantanplan (ours) & \textbf{92.75} & \textbf{53s}\\
 \hline
 \end{tabular}
 \end{center}
-\caption{\label{table.3}Scores on Navarro-Colorado's fixed-metre 10,000 verses corpus. Best scores in bold.}
+\caption{\label{table.3}Scores on Navarro-Colorado's fixed-metre 10,000 verses corpus. Best scores in bold}
 \end{table}
 \footnotetext{Similarly, Gervás' method was only evaluated on 9,643 verses of the 10,000 verses corpus.}
 
 Lastly, for the evaluation of mixed-metre poetry we are using our own corpus of over 4,300 verses obtained from Carjaval's annotated anthology \shortcite{fernandez2003antologia}. Unfortunately, due to copyright issues we are unable to release our annotated corpus for mixed-metre poetry. Table \ref{table.4} shows results comparing performance of our method against Navarro-Colorado's \shortcite{navarro2017metrical}, showing that our approach is over 250 times faster and better suited to handle metrical stress that differ from a fixed value with a 15\% increase in accuracy over Navarro-Colorado's system.
+
+In addition to the improvements in accuracy for the different corpora, execution times seem to grow approximately linear with corpus size once we take into consideration that the loading time for the statistical model of Spanish in spaCy is 18 seconds, which gives execution times of 3 seconds for 1,400 verses, 9 seconds for 4,300 verses, and 35 seconds for 10,000 verses.
 
 \begin{table} [htbp]
 \begin{center}
@@ -247,10 +248,9 @@ Rantanplan (ours) & \textbf{65.02} & \textbf{27s} \\
 \hline
 \end{tabular}
 \end{center}
-\caption{\label{table.4}Scores on Carvajal's mixed-metre 4,300 verses corpus. Best scores in bold.}
+\caption{\label{table.4}Scores on Carvajal's mixed-metre 4,300 verses corpus. Best scores in bold}
 \end{table}
 
-In addition to the improvements in accuracy for the different corpora, execution times seem to grow approximately linear with corpus size once we take into consideration that the loading time for the statistical model of Spanish in spaCy is 18 seconds, which gives execution times of 3 seconds for 1,400 verses, 9 seconds for 4,300 verses, and 35 seconds for 10,000 verses.
 
 \section{Limitations}
 Despite the good scores obtained by our method, it is still based on a heuristic. Although thoroughly tested against different corpora, it could be the case that the heuristic we developed cannot account for changes in poetic production over time, thus rendering our system unable to accurately assess metrical patterns in modern expressions of poetry. We would need a more recent corpus to test this issue, but unfortunately most of these texts are still under copyright.
@@ -276,3 +276,4 @@ A demo of Rantanplan can be found online at \url{http://postdata.uned.es/poetryl
 To reproduce the results in this paper, please, refer to the next code repository: \url{https://github.com/linhd-postdata/rantanplan-evaluation}.
 
 \end{document}
+
